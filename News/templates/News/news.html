@@ -1,0 +1,15 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for post in news %}
+<p>{{ post.title }}, 
+{{ post.dateCreation }}, 
+{{ post.text|truncatechars:20 }}</p>
+{% endfor %}
+</body>
