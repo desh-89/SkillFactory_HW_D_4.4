@@ -1,12 +1,17 @@
-from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.shortcuts import render
+from django.core.validators import MinValueValidator
+from datetime import datetime
 
 
 class Author(models.Model):
     authorUser = models.OneToOneField(User, on_delete=models.CASCADE)
     ratingAuthor = models.SmallIntegerField(default=0)
+
+    def __str__(self):
+        return self.authorUser.username
 
     def update_rating(self):
         postRat = self.post_set.aggregate(postRating=Sum('rating'))
@@ -21,7 +26,6 @@ class Author(models.Model):
         self.save()
 
 
-
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -31,6 +35,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+
 
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -48,6 +53,9 @@ class Post(models.Model):
     text = models.TextField()
     rating = models.SmallIntegerField(default=0)
 
+    def __str__(self):
+        return f'{self.author}, {self.categoryType}, {self.title}, {self.rating}'
+
     def like(self):
         self.rating += 1
         self.save()
@@ -57,10 +65,11 @@ class Post(models.Model):
         self.save()
 
     def preview(self):
-        return self.text[0:123] + '...'
+        return f'{self.text[:123]}...'
     
-    def __str__(self):
-        return self.title
+
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
         
     class Meta:
         verbose_name = 'Новость'
@@ -68,10 +77,12 @@ class Post(models.Model):
         ordering = ['-dateCreation']
 
 
-
 class PostCategory(models.Model):
     postThrough = models.ForeignKey(Post, on_delete=models.CASCADE)
     categoryThrough = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.post}, {self.category}'
 
 
 class Comment(models.Model):
@@ -81,6 +92,9 @@ class Comment(models.Model):
     dateCreation = models.DateTimeField(auto_now_add=True)
     rating = models.SmallIntegerField(default=0)
     
+    def __str__(self):
+        return self.commentUser.username
+
     def like(self):
         self.rating += 1
         self.save()
@@ -88,9 +102,6 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
-    
-    def __str__(self):
-        return self.text
         
     class Meta:
         verbose_name = 'Комментарий'

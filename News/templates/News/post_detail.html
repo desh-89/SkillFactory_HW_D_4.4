@@ -1,14 +1,13 @@
+{% extends 'default.html' %}
 {% load custom_filters %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{ post.title }}<br>
-{{ post.text }}<br>
-{{ post.dateCreation }}
-</body>
-</html>
+{% block title %}
+Post
+{% endblock title %}
+
+
+{% block content %}
+        {{ new.title|censor }}  -  {{new.dateCreation|date:'d M Y'}}</p>
+         {{ new.text|censor }}</p>
+         <a href="/news/">Назад к списку новостей</a> </p>
+{% endblock content %}
